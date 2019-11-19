@@ -1,14 +1,43 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/login">Login</router-link>
+      <div v-if="isLoggedIn">
+        <router-link to="/">Home</router-link> |
+        <a @click.prevent="logout" href="/logout">Logout</a>
+        <!-- prevent 를 사용하는 이유는 href 로 redirect 를 방지하기 위함 -->
+      </div>
+      <div v-else>
+        <router-link to="/login">Login</router-link>
+      </div>
     </div>
     <div class="container col-6">
       <router-view/>
     </div>
   </div>
 </template>
+
+<script>
+import router from '@/router'
+
+export default {
+  name: 'App',
+  data() {
+    return {
+      isLoggedIn: this.$session.has('jwt')
+    }
+  },
+  methods: {
+    logout() {
+      this.$session.destroy()
+      router.push('/login')
+    }
+  },
+  // data 에 변화가 일어나는 시점에 실행하는 함수
+  updated() {
+    this.isLoggedIn = this.$session.has('jwt')
+  },
+}
+</script>
 
 <style>
 #app {
